@@ -1,6 +1,9 @@
 package com.grademe.grademe.server;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -33,11 +36,16 @@ public class S3Service {
         String bucketName = "grademe-input";
         String key = "projects/"+projectId+"/project.zip";
 
+        AWSCredentials credentials = new BasicAWSCredentials(
+                System.getenv("AWS_ACCESS_KEY_ID"),
+                System.getenv("AWS_SECRET_ACCESS_KEY")
+        );
+
         S3Object fullObject = null, objectPortion = null, headerOverrideObject = null;
         try {
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
                     .withRegion(clientRegion)
-                    .withCredentials(new ProfileCredentialsProvider())
+                    .withCredentials(new AWSStaticCredentialsProvider(credentials))
                     .build();
 
             // Get an object
