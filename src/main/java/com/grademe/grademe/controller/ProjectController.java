@@ -23,7 +23,7 @@ public class ProjectController {
     public @ResponseBody Report testProject(@RequestParam(value="projectId") String projectId, @RequestParam("implFile") MultipartFile mFileFromUser) throws Exception {
 
         File projectZip = new File("src/main/resources/projects/project.zip");
-        s3Service.getProject(projectId,projectZip,3);
+        s3Service.getProject(projectId,projectZip);
 
         File unzipDir = new File("src/main/resources/projects");
         FileUtils.unzip(projectZip.getAbsolutePath(),unzipDir.getAbsolutePath());

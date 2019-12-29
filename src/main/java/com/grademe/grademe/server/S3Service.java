@@ -17,20 +17,6 @@ import java.io.*;
 
 @Component
 public class S3Service {
-    public void getProject(String projectId, File destination, int retryNumber) throws InterruptedException{
-        try{
-            getProject(projectId,destination);
-        }catch (Exception e){
-            if(retryNumber > 0){
-                retryNumber--;
-                Thread.sleep(5000);
-                getProject(projectId,destination,retryNumber);
-            }else {
-                throw new RuntimeException("Error while getting Project from S3 bucket");
-            }
-        }
-    }
-
     public void getProject(String projectId, File destination) throws Exception{
         Regions clientRegion = Regions.US_EAST_1;
         String bucketName = "grademe-input";
