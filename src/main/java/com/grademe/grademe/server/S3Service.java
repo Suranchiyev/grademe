@@ -27,40 +27,23 @@ public class S3Service {
                 System.getenv("AWS_SECRET_ACCESS_KEY")
         );
 
-        S3Object fullObject = null, objectPortion = null, headerOverrideObject = null;
-        try {
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withRegion(clientRegion)
-                    .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                    .build();
+        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withRegion(clientRegion)
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
+
+        try(S3Object fullObject = s3Client.getObject(new GetObjectRequest(bucketName, key))){
 
             // Get an object
             System.out.println("Downloading an object");
-            fullObject = s3Client.getObject(new GetObjectRequest(bucketName, key));
             System.out.println("Content-Type: " + fullObject.getObjectMetadata().getContentType());
             System.out.println("Content: ");
 
             FileUtils.writeStream(fullObject.getObjectContent(),destination);
 
         } catch (AmazonServiceException e) {
-            // The call was transmitted successfully, but Amazon S3 couldn't process
-            // it, so it returned an error response.
+            e.printStackTrace();
             throw new RuntimeException(e);
-        } catch (SdkClientException e) {
-            // Amazon S3 couldn't be contacted for a response, or the client
-            // couldn't parse the response from Amazon S3.
-            throw new RuntimeException(e);
-        } finally {
-            // To ensure that the network connection doesn't remain open, close any open input streams.
-            if (fullObject != null) {
-                fullObject.close();
-            }
-            if (objectPortion != null) {
-                objectPortion.close();
-            }
-            if (headerOverrideObject != null) {
-                headerOverrideObject.close();
-            }
         }
     }
 
