@@ -28,6 +28,12 @@ public class ProjectController {
             projectsDir.mkdir();
         }
 
+        String tmpDir = System.getProperty("user.home")+"/tmp";
+        File tmpDirFile = new File(tmpDir);
+        if(!tmpDirFile.exists()){
+            tmpDirFile.mkdir();
+        }
+
         File projectZip = new File(projectsDir.getAbsolutePath()+"/project.zip");
         s3Service.getProject(projectId,projectZip,3);
 
@@ -38,7 +44,7 @@ public class ProjectController {
         System.out.println("Project Dir:");
         System.out.println(project.getAbsolutePath());
 
-        File implFromUser = new File("src/main/resources/Project.java");
+        File implFromUser = new File(tmpDirFile.getAbsolutePath()+"/Project.java");
         FileUtils.writeStream(mFileFromUser.getInputStream(), implFromUser);
 
         File implInProject = new File(project.getAbsolutePath()+"/src/main/java/Project.java");
