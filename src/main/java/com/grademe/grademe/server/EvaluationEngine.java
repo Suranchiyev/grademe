@@ -59,7 +59,7 @@ public class EvaluationEngine {
         }
     }
 
-    public Report getReportObject(long projectId){
+    public Report getReportObject(File project,long projectId){
         try{
             System.out.println("Getting Reports..");
 
@@ -71,7 +71,7 @@ public class EvaluationEngine {
             report.setProjectId(projectId);
             List<TestCase> testCases = new ArrayList<>();
 
-            File reportXml = new File("src/main/resources/projects/project/target/surefire-reports/TEST-TestProject.xml");
+            File reportXml = new File(project.getAbsolutePath()+"/target/surefire-reports/TEST-TestProject.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(reportXml);

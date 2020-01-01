@@ -22,10 +22,16 @@ public class ProjectController {
     @PostMapping("/testProject")
     public @ResponseBody Report testProject(@RequestParam(value="projectId") String projectId, @RequestParam("implFile") MultipartFile mFileFromUser) throws Exception {
 
-        File projectZip = new File("src/main/resources/projects/project.zip");
-        s3Service.getProject(projectId,projectZip);
+        String currentUsersHomeDir = System.getProperty("user.home")+File.separator+"projects";
+        File projectsDir = new File(currentUsersHomeDir);
+        if(!projectsDir.exists()){
+            projectsDir.mkdir();
+        }
 
-        File unzipDir = new File("src/main/resources/projects");
+        File projectZip = new File(projectsDir.getAbsolutePath()+File.separator+"project.zip");
+        s3Service.getProject(projectId,projectZip,3);
+
+        File unzipDir = new File(projectsDir.getAbsolutePath());
         FileUtils.unzip(projectZip.getAbsolutePath(),unzipDir.getAbsolutePath());
 
         File project = new File(unzipDir.getAbsolutePath()+"/project");
@@ -39,7 +45,7 @@ public class ProjectController {
         FileUtils.replaceFile(implFromUser,implInProject);
 
         engine.evaluateProject(project);
-        Report report = engine.getReportObject(Long.parseLong(projectId));
+        Report report = engine.getReportObject(project,Long.parseLong(projectId));
 
         FileUtils.deleteAll(project);
         FileUtils.deleteAll(projectZip);
