@@ -30,6 +30,7 @@ public class FileUtils {
         try {
             ZipFile zipFile = new ZipFile(source);
             zipFile.extractAll(destination);
+            System.out.println("Successfully unzipped: "+destination);
         } catch (ZipException e) {
             e.printStackTrace();
         }
@@ -61,7 +62,7 @@ public class FileUtils {
             }
         }catch(IOException e){
             e.printStackTrace();
-            throw new RuntimeException("Failed in writeStream()");
+            throw new RuntimeException("Failed in writeStream(): "+e.getMessage());
         }
     }
 
@@ -96,7 +97,7 @@ public class FileUtils {
 
         }catch (IOException e){
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 

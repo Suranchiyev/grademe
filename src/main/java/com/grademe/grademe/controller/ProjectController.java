@@ -22,20 +22,21 @@ public class ProjectController {
     @PostMapping("/testProject")
     public @ResponseBody Report testProject(@RequestParam(value="projectId") String projectId, @RequestParam("implFile") MultipartFile mFileFromUser) throws Exception {
 
-        String currentUsersHomeDir = System.getProperty("user.home")+File.separator+"projects";
+        String currentUsersHomeDir = System.getProperty("user.home")+"/projects";
         File projectsDir = new File(currentUsersHomeDir);
         if(!projectsDir.exists()){
             projectsDir.mkdir();
         }
 
-        File projectZip = new File(projectsDir.getAbsolutePath()+File.separator+"project.zip");
+        File projectZip = new File(projectsDir.getAbsolutePath()+"/project.zip");
         s3Service.getProject(projectId,projectZip,3);
 
         File unzipDir = new File(projectsDir.getAbsolutePath());
         FileUtils.unzip(projectZip.getAbsolutePath(),unzipDir.getAbsolutePath());
 
         File project = new File(unzipDir.getAbsolutePath()+"/project");
-
+        System.out.println("Project Dir:");
+        System.out.println(project.getAbsolutePath());
 
         File implFromUser = new File("src/main/resources/Project.java");
         FileUtils.writeStream(mFileFromUser.getInputStream(), implFromUser);
@@ -48,6 +49,9 @@ public class ProjectController {
         Report report = engine.getReportObject(project,Long.parseLong(projectId));
 
         FileUtils.deleteAll(project);
+        System.out.println("Project Cleaned Up: ");
+        System.out.println(project.getAbsolutePath());
+
         FileUtils.deleteAll(projectZip);
         FileUtils.deleteAll(implFromUser);
 

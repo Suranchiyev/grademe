@@ -24,8 +24,10 @@ public class EvaluationEngine {
         try {
             ProcessBuilder builder = new ProcessBuilder();
             if (isWindows) {
+                System.out.println("Evaluation in Windows:");
                 builder.command("cmd.exe", "/c", "mvn clean test");
             } else {
+                System.out.println("Evaluation in Linux:");
                 builder.command("sh", "-c", "mvn clean test");
             }
 
@@ -36,6 +38,7 @@ public class EvaluationEngine {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
     }

@@ -24,6 +24,7 @@ public class S3Service {
     public void getProject(String projectId, File destination, int retryNumber) throws InterruptedException{
         try{
             getProject(projectId,destination);
+            System.out.println("project successfully downloaded from s3 bucket");
         }catch (Exception e){
             if(retryNumber > 0){
                 retryNumber--;
