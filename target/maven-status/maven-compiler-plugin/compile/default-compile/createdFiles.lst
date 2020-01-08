@@ -1,0 +1,7 @@
+com\grademe\grademe\beans\TestCase.class
+com\grademe\grademe\controller\ProjectController.class
+com\grademe\grademe\util\FileUtils.class
+com\grademe\grademe\beans\Report.class
+com\grademe\grademe\GrademeApplication.class
+com\grademe\grademe\server\EvaluationEngine.class
+com\grademe\grademe\server\S3Service.class
