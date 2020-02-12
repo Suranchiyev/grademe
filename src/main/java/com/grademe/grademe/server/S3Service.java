@@ -26,6 +26,7 @@ public class S3Service {
             getProject(projectId,destination);
             System.out.println("project successfully downloaded from s3 bucket");
         }catch (Exception e){
+            e.printStackTrace();
             if(retryNumber > 0){
                 retryNumber--;
                 Thread.sleep(5000);
@@ -43,11 +44,6 @@ public class S3Service {
 
         S3Object fullObject = null, objectPortion = null, headerOverrideObject = null;
         try {
-
-//            AWSCredentials credentials = new BasicAWSCredentials(
-//                    env.getProperty("AWS_ACCESS_KEY_ID"),
-//                    env.getProperty("AWS_SECRET_ACCESS_KEY")
-//            );
 
             AWSCredentials credentials = new BasicAWSCredentials(
                     System.getenv("AWS_ACCESS_KEY_ID"),

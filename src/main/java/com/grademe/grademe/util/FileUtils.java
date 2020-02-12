@@ -4,6 +4,8 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtils {
     public static void copyFile(File origin, File copy)
@@ -66,6 +68,17 @@ public class FileUtils {
         }
     }
 
+    public static void writeString(String content, File outputFile) {
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))){
+            writer.write(content);
+        }catch (IOException e){
+            e.printStackTrace();
+            throw new RuntimeException("Failed in writeMethod(): "+e.getMessage());
+        }
+
+    }
+
+
     public static void deleteAll( File dir) {
         if(dir.delete()) {
 
@@ -99,6 +112,20 @@ public class FileUtils {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public static List<String> getFileContent(String path){
+        List<String> content = new ArrayList<>();
+        File file = new File(path);
+        try(BufferedReader reader = new BufferedReader(new FileReader(file))){
+            String line;
+            while((line = reader.readLine()) != null){
+                content.add(line);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return content;
     }
 
 }

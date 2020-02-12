@@ -2,6 +2,7 @@ package com.grademe.grademe.beans;
 
 public class TestCase {
     private String caseName;
+    private String caseDesc;
     private boolean isPass;
     private String message;
 
@@ -11,6 +12,14 @@ public class TestCase {
 
     public void setCaseName(String caseName) {
         this.caseName = caseName;
+    }
+
+    public String getCaseDesc() {
+        return caseDesc;
+    }
+
+    public void setCaseDesc(String caseDesc) {
+        this.caseDesc = caseDesc;
     }
 
     public boolean isPass() {
@@ -28,4 +37,6 @@ public class TestCase {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
 }

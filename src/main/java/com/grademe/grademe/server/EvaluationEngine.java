@@ -2,6 +2,7 @@ package com.grademe.grademe.server;
 
 import com.grademe.grademe.beans.Report;
 import com.grademe.grademe.beans.TestCase;
+import com.grademe.grademe.util.FileUtils;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,8 +13,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 @Component
 public class EvaluationEngine {
@@ -65,7 +67,9 @@ public class EvaluationEngine {
     public Report getReportObject(File project,long projectId){
         try{
             System.out.println("Getting Reports..");
-
+            //Get Test class content and revers lines
+            List<String> testClassContent = FileUtils.getFileContent(project.getAbsolutePath()+"/src/test/java/TestProject.java");
+            Collections.reverse(testClassContent);
             int totalTestCases;
             int passTestCases = 0;
             int grade;
@@ -87,6 +91,7 @@ public class EvaluationEngine {
             {
                 TestCase caseBean = new TestCase();
 
+
                 Node testcase = nList.item(i);
                 if(testcase.hasChildNodes())
                 {
@@ -104,6 +109,10 @@ public class EvaluationEngine {
                     caseBean.setMessage("PASS: ");
                     testCases.add(caseBean);
                 }
+
+                String caseName = caseBean.getCaseName().split(Pattern.quote("."))[1];
+                System.out.println("CASE NAME: "+caseName);
+                caseBean.setCaseDesc(getCaseDescByName(testClassContent, caseName));
             }
 
             grade = (passTestCases * 100) / totalTestCases;
@@ -115,4 +124,20 @@ public class EvaluationEngine {
             throw new RuntimeException(e);
         }
     }
+
+    private String getCaseDescByName(List<String> content, String caseName){
+        boolean searchDesc = false;
+        for(String line : content){
+            if(line.contains("void "+caseName+"()")){
+                System.out.println("Setting true..");
+                searchDesc = true;
+            }
+            if(searchDesc && line.contains("@DisplayName")){
+                System.out.println("Returning: "+line.split("\"")[1].trim());
+                return line.split("\"")[1].trim();
+            }
+        }
+        return caseName;
+    }
+
 }
