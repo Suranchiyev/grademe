@@ -22,7 +22,84 @@ public class EvaluationEngine {
 
     private boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 
-    public void evaluateProject(File project) {
+    public List<String> compile(File fileDirectory){
+        try{
+            ProcessBuilder builder = new ProcessBuilder();
+
+            if (isWindows) {
+                System.out.println("Compilation in Windows:");
+                builder.command("cmd.exe", "/c", "echo javac Project.java");
+               // builder.command("cmd.exe", "/c", "dir");
+
+            } else {
+                System.out.println("Compilation in Linux:");
+                builder.command("sh", "-c", "javac Project.java");
+            }
+
+            builder.directory(fileDirectory);
+            Process process = builder.start();
+            List<String> consoleContent = streamResults(process.getErrorStream());
+            process.destroy();
+
+            return consoleContent;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> run(File fileDirectory){
+        try{
+            ProcessBuilder builder = new ProcessBuilder();
+            if (isWindows) {
+                System.out.println("Compilation in Windows:");
+                builder.command("cmd.exe", "/c", "java Project");
+
+            } else {
+                System.out.println("Compilation in Linux:");
+                builder.command("sh", "-c", "java Project");
+            }
+
+            builder.directory(fileDirectory);
+            Process process = builder.start();
+            List<String> consoleContent = streamResults(process.getInputStream());
+            process.destroy();
+
+            return consoleContent;
+        }catch(Exception e){
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<String> streamResults(InputStream inputStream){
+        try{
+            List<String> content = new ArrayList<>();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+
+            System.out.println("Streamin..");
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println("Line: "+line);
+                content.add(line);
+            }
+
+            inputStream.close();
+            inputStreamReader.close();
+            reader.close();
+
+            System.out.println("Streaming is done.");
+
+            return content;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> evaluateProject(File project) {
         try {
             ProcessBuilder builder = new ProcessBuilder();
             if (isWindows) {
@@ -35,8 +112,10 @@ public class EvaluationEngine {
 
             builder.directory(project);
             Process process = builder.start();
-            streamResults(process.getInputStream());
+            List<String> errorContent = streamErrorResults(process.getInputStream());
             process.destroy();
+
+            return errorContent;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,22 +124,47 @@ public class EvaluationEngine {
 
     }
 
-    private void streamResults(InputStream inputStream){
+    private List<String> streamErrorResults(InputStream inputStream){
         try{
+            List<String> errorContent = new ArrayList<>();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader reader = new BufferedReader(inputStreamReader);
 
+            boolean compileErrorFound = false;
+
             String line;
+            int numberOfLines = 0;
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
+
+                if(line.contains("[Help 1]")){
+                    compileErrorFound = false;
+                }
+
+                if(line.contains("Compilation failure")){
+                    compileErrorFound = true;
+                }
+
+                if(compileErrorFound){
+                    errorContent.add(line);
+                }
+
+                numberOfLines++;
+                if(numberOfLines > 1000){
+                    errorContent.add("System limitations: Number of lines exited over 1000");
+                    break;
+                }
             }
 
             inputStream.close();
             inputStreamReader.close();
             reader.close();
 
+            return errorContent;
+
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -115,9 +219,13 @@ public class EvaluationEngine {
                 caseBean.setCaseDesc(getCaseDescByName(testClassContent, caseName));
             }
 
+            System.out.println("PASS TEST CASES: "+(passTestCases * 100));
+            System.out.println("TOTAL TEST CASES: "+totalTestCases);
+
             grade = (passTestCases * 100) / totalTestCases;
             report.setGrade(grade);
             report.setTestCases(testCases);
+            report.setCompiled(true);
             return report;
 
         }catch(Exception e){

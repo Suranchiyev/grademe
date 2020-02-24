@@ -44,7 +44,7 @@ public class S3Service {
 
         S3Object fullObject = null, objectPortion = null, headerOverrideObject = null;
         try {
-
+            
             AWSCredentials credentials = new BasicAWSCredentials(
                     System.getenv("AWS_ACCESS_KEY_ID"),
                     System.getenv("AWS_SECRET_ACCESS_KEY")
